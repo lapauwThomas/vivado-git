@@ -1,0 +1,11 @@
+vivado_project/*
+
+
+vivado_pathfile.txt
+
+/vivado*.str
+/vivado*.txt
+/vivado*.jou
+/vivado*.log
+.Xil/
+NA/
