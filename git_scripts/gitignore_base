@@ -1,5 +1,6 @@
 vivado_project/*
 
+git_vivado_commit_lock
 
 vivado_pathfile.txt
 
