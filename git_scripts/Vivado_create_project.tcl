@@ -33,9 +33,8 @@ namespace eval ::git_vivado_helper {
         file mkdir vivado_project
     	puts ""
         set project_path [file normalize ./vivado_project]
-        exec powershell Set-Clipboard -Value "$project_path"
-     	send_msg_id Vivado-git-001 WARN "Project needs to be created manually in \"$project_path\""
-        send_msg_id Vivado-git-001 WARN "Use File > Project > New to create it. Path has been copied on clipboard"
+     	send_msg_id Vivado-git-001 WARN "Project needs to be created manually in \"$project_path\"."
+        send_msg_id Vivado-git-001 WARN "Use File > Project > New to create it."
         puts ""
         puts ""
         

@@ -24,20 +24,55 @@ Function pause ($message) {
     $host.ui.RawUI.ReadKey("NoEcho,IncludeKeyDown")
 }
 
+
+Function Get-Folder($initialDirectory) {
+    [void] [System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms')
+    $FolderBrowserDialog = New-Object System.Windows.Forms.FolderBrowserDialog
+    $FolderBrowserDialog.RootFolder = 'MyComputer'
+	$FolderBrowserDialog.Description = 'Navigate to the folder on your disk containing the Vivado binary. Typically this is at C:/Xilinx/Vivado/xx-YOURVERSION-xx/bin/'
+    if ($initialDirectory) { $FolderBrowserDialog.SelectedPath = $initialDirectory }
+    [void] $FolderBrowserDialog.ShowDialog()
+    return $FolderBrowserDialog.SelectedPath
+}
+
+function Vivado-From-Pathfile {
+	 if ((Test-Path -Path $vivado_pathfile_name -PathType Leaf)) {
+        $vivado_path = Get-Content $vivado_pathfile_name
+        Write-Host "Vivado from pathfile: " $vivado_path
+        if ((Test-Path -Path $vivado_pathfile_name -PathType Leaf)){
+            return "$vivado_path\$vivado_executable_name"
+        }else{
+            Write-Host "Vivado not found in pathfile path. Check and try again" -ForegroundColor Red
+            Invoke-Item $vivado_pathfile_name
+            return $null
+        }
+	 }
+}
+
 function Get-Vivado-Path {
     if ((Get-Command $vivado_executable_name -ErrorAction SilentlyContinue) ) { 
         $vivado_path = (Get-Command $vivado_executable_name).Path
         Write-host "Vivado found on path at:" $vivado_path
         return $vivado_path
     }
+	$path = Vivado-From-Pathfile 
+	if ($path ){
+		return $path
+   
 
-    if ((Test-Path -Path $vivado_pathfile_name -PathType Leaf)) {
-        $vivado_path = Get-Content $vivado_pathfile_name
-        Write-Host "Vivado from pathfile: " $vivado_path
-        return $vivado_path
+    }else{
+        New-Item $vivado_pathfile_name -Force | Out-Null
+		Write-Host "No pathfile found in root. Creating pathfile. Navigate to your vivado path (C:/Xilinx ..../20xx.x/bin/)" -ForegroundColor Red
+		$selectedPath = Get-Folder('C:\Xilinx\Vivado\')
+		Write-Host "SelectedPath = $selectedPath"
+        Set-Content $vivado_pathfile_name $selectedPath
+		$vivado_path = Vivado-From-Pathfile
+		Write-host "Vivado found on path at:" $vivado_path
+		return $vivado_path
     }
     return $NULL
 }
+
 
 function Select-Project-TCL-Path {
     $filenames = @()
